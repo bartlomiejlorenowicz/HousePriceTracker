@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-users" author="Bartek">
+        <sql>
+            CREATE TABLE users
+            (
+                id                    BIGSERIAL PRIMARY KEY,
+                email                 VARCHAR(255) NOT NULL UNIQUE,
+                password_hash         VARCHAR(255) NOT NULL,
+                first_name            VARCHAR(255) NOT NULL,
+                last_name             VARCHAR(255) NOT NULL,
+                created_at            TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at            TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_login_at         TIMESTAMP,
+                status                VARCHAR(255) NOT NULL,
+                failed_login_attempts INTEGER DEFAULT 0,
+                locked_until          TIMESTAMP,
+                email_verified        BOOLEAN DEFAULT FALSE
+            );
+
+            ALTER TABLE users
+                ADD CONSTRAINT chk_user_status
+                    CHECK (status IN ('ACTIVE', 'INACTIVE', 'LOCKED'));
+        </sql>
+    </changeSet>
+
+    <changeSet id="002-create-roles" author="Bartek">
+        <sql>
+            CREATE TABLE roles (
+                id BIGSERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="003-create-user-roles" author="Bartek">
+        <sql>
+            CREATE TABLE user_roles (
+                user_id BIGINT NOT NULL,
+                role_id BIGINT NOT NULL,
+                PRIMARY KEY (user_id, role_id),
+                CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id)
+                                    REFERENCES users(id) ON DELETE CASCADE,
+                CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id)
+                                    REFERENCES roles(id) ON DELETE CASCADE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="004-insert-roles" author="Bartek">
+        <sql>
+            INSERT INTO roles (name) VALUES ('USER');
+            INSERT INTO roles (name) VALUES ('ADMIN');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
