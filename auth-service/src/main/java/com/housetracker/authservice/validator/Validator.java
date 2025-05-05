@@ -1,7 +1,5 @@
 package com.housetracker.authservice.validator;
 
-import com.housetracker.authservice.dto.registerDto.UserDto;
-
 import static java.util.Objects.isNull;
 
 public abstract class Validator<T> {

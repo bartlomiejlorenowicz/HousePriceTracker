@@ -6,7 +6,6 @@ import com.housetracker.authservice.entity.User;
 import com.housetracker.authservice.repository.RoleRepository;
 import com.housetracker.authservice.user.RoleType;
 import com.housetracker.authservice.user.UserStatus;
-import jakarta.persistence.Column;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
