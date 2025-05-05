@@ -28,8 +28,8 @@ public class JwtUtils {
 
     @PostConstruct
     public void init() {
-//        log.info("Initializing JwtUtils with secret length={} and expirationMs={}",
-//                secretKey.length(), expirationTime);
+        log.info("Initializing JwtUtils with secret length={} and expirationMs={}",
+                secretKey.length(), expirationTime);
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -47,7 +47,7 @@ public class JwtUtils {
     }
 
     public String extractUsername(String token) {
-//        log.debug("Extracting username from token");
+        log.debug("Extracting username from token");
         try {
             String username = Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -55,16 +55,16 @@ public class JwtUtils {
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
-//            log.trace("Extracted username='{}'", username);
+            log.trace("Extracted username='{}'", username);
             return username;
         } catch (JwtException e) {
-//            log.warn("Failed to extract username from token: {}", e.getMessage());
+            log.warn("Failed to extract username from token: {}", e.getMessage());
             throw e;
         }
     }
 
     public boolean validateToken(String token, String username) {
-//        log.debug("Validating token for user='{}'", username);
+        log.debug("Validating token for user='{}'", username);
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -74,7 +74,7 @@ public class JwtUtils {
             return username.equals(claims.getSubject())
                     && !claims.getExpiration().before(new Date());
         } catch (JwtException e) {
-//            log.warn("Token validation error: {}", e.getMessage());
+            log.warn("Token validation error: {}", e.getMessage());
             return false;
         }
     }
