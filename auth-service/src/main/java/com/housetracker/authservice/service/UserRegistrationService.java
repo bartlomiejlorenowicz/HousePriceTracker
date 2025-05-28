@@ -39,6 +39,9 @@ public class UserRegistrationService {
                 user.getLastName()
         );
 
-
+        rabbit.convertAndSend(exchange, routingKey, ev, message -> {
+            message.getMessageProperties().setContentType("application/json");
+            return message;
+        });
     }
 }
