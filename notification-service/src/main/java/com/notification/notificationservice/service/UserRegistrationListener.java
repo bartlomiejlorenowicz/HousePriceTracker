@@ -1,6 +1,8 @@
 package com.notification.notificationservice.service;
 
-import com.housetracker.authservice.dto.event.UserRegisteredEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.notification.notificationservice.dto.UserNotificationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -10,16 +12,20 @@ public class UserRegistrationListener {
 
     private final EmailService emailService;
 
-    public UserRegistrationListener(EmailService emailService) {
+    private final ObjectMapper objectMapper;
+
+    public UserRegistrationListener(EmailService emailService, ObjectMapper objectMapper) {
         this.emailService = emailService;
+        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = "user.registered.queue")
-    public void onUserRegistered(UserRegisteredEvent event) {
-        log.info("Received UserRegisteredEvent for user: {}", event.getEmail());
+    public void onUserRegistered(String event) throws JsonProcessingException {
+        UserNotificationEvent userNotificationEvent = objectMapper.readValue(event, UserNotificationEvent.class);
+        log.info("Received UserRegisteredEvent for user: {}", userNotificationEvent.getEmail());
         String subject = "Welcome to Our Service!";
-        String body = String.format("Hi %s,\n\nThank you for registering with us. We hope you enjoy using our service!", event.getFirstName());
-        emailService.sendWelcomeEmail(event.getEmail(), body);
+        String body = String.format("Hi %s,\n\nThank you for registering with us. We hope you enjoy using our service!", userNotificationEvent.getFirstName());
+        emailService.sendWelcomeEmail(userNotificationEvent.getEmail(), body);
     }
 
 }

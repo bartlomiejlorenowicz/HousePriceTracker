@@ -40,7 +40,7 @@ public class UserRegistrationService {
         );
 
         rabbit.convertAndSend(exchange, routingKey, ev, message -> {
-            message.getMessageProperties().setContentType("application/json");
+//            message.getMessageProperties().setContentType("application/json");
             return message;
         });
     }

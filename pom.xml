@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+    </dependencies>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -10,14 +16,16 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.housetracker</groupId>
-    <artifactId>user-authentication</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>com.scrapper</groupId>
+    <artifactId>house-price-tracker</artifactId>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>auth-service</module>
-
+        <module>flat-watcher-service</module>
+        <module>notification-service</module>
+        <module>eureka</module>
     </modules>
 
     <dependencyManagement>
@@ -35,7 +43,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.3.8</version>
+                <version>3.4.5</version>
             </dependency>
             <dependency>
                 <groupId>org.liquibase</groupId>
@@ -45,11 +53,17 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.24</version>
+                <version>1.18.30</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-mail</artifactId>
+                <version>3.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -65,11 +79,6 @@
                         <source>17</source>
                         <target>17</target>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>3.4.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
