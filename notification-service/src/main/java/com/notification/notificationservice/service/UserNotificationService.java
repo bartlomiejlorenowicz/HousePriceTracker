@@ -1,10 +1,11 @@
 package com.notification.notificationservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
 public class UserNotificationService {
     private final Queue userQueue;
@@ -12,7 +13,6 @@ public class UserNotificationService {
     private final Binding binding;
     private final EmailService emailService;
 
-    // Wstrzykiwanie zależności przez konstruktor
     public UserNotificationService(Queue userQueue, TopicExchange exchange, Binding binding, EmailService emailService) {
         this.userQueue = userQueue;
         this.exchange = exchange;
@@ -27,6 +27,6 @@ public class UserNotificationService {
 
 
     public void sendNotification() {
-        System.out.println("Sending notification to queue: " + userQueue.getName());
+        log.info("Sending notification to queue: {}", userQueue.getName());
     }
 }
