@@ -28,6 +28,7 @@ public class EmailService {
         String body = String.format("Hi %s,\n\nThank you for registering with us. We hope you enjoy using our service!", firstName);
 
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("lorenowiczbartlomiej@gmail.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
