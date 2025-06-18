@@ -10,11 +10,12 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.housetracker</groupId>
+    <groupId>com.scrapper</groupId>
     <artifactId>auth-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>user-authentication</name>
     <description>user-authentication</description>
+    <packaging>jar</packaging>
     <url/>
     <licenses>
         <license/>
@@ -132,6 +133,13 @@
                             <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.scrapper.UserAuthenticationApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
