@@ -1,6 +1,6 @@
-package com.housetracker.authservice.config;
+package com.scrapper.authservice.config;
 
-import com.housetracker.authservice.security.JwtAuthenticationFilter;
+import com.scrapper.authservice.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

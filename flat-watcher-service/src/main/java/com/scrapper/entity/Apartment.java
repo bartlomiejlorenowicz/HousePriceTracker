@@ -1,8 +1,10 @@
-package com.scrapper.apartmentscraper.entity;
+package com.scrapper.entity;
 
+import com.scrapper.dto.Currency;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +20,6 @@ public class Apartment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ID użytkownika (pochodzi z tokena JWT lub innego mikroserwisu)
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -26,10 +27,14 @@ public class Apartment {
     private String address;
 
     @Column(name = "price", nullable = false)
-    private String price;
+    private BigDecimal price;
+
+    @Column(name = "currency", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @Column(name = "initial_price", nullable = false)
-    private String initialPrice;
+    private BigDecimal initialPrice;
 
     @Column(name = "url", nullable = false, unique = true)
     private String url;
