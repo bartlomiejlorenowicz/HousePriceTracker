@@ -48,5 +48,7 @@ public class Apartment {
     @Column(name = "room_count", nullable = false)
     private Integer roomCount;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
 }
 
