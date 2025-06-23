@@ -1,12 +1,12 @@
 package com.housetracker.authservice.service;
 
-import com.housetracker.authservice.config.RabbitConfig;
-import com.housetracker.authservice.dto.event.UserRegisteredEvent;
-import com.housetracker.authservice.dto.registerDto.UserDto;
-import com.housetracker.authservice.entity.User;
-import com.housetracker.authservice.mapper.UserMapper;
-import com.housetracker.authservice.repository.UserRepository;
-import com.housetracker.authservice.validator.Userregistration.UserValidator;
+import com.scrapper.authservice.config.RabbitConfig;
+import com.scrapper.authservice.dto.event.UserRegisteredEvent;
+import com.scrapper.authservice.dto.registerDto.UserDto;
+import com.scrapper.authservice.entity.User;
+import com.scrapper.authservice.mapper.UserMapper;
+import com.scrapper.authservice.repository.UserRepository;
+import com.scrapper.authservice.validator.Userregistration.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -40,7 +40,6 @@ public class UserRegistrationService {
         );
 
         rabbit.convertAndSend(exchange, routingKey, ev, message -> {
-//            message.getMessageProperties().setContentType("application/json");
             return message;
         });
     }
