@@ -57,6 +57,7 @@ public class ApartmentService {
                                 .lastCheckedAt(now)
                                 .roomCount(0)
                                 .currency(scrapedApartment.getCurrency())
+                                .isActive(true)
                                 .build();
                         repository.save(a);
                     });

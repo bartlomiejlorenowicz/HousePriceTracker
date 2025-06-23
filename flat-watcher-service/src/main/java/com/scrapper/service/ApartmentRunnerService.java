@@ -2,6 +2,8 @@ package com.scrapper.service;
 
 import com.scrapper.dto.Currency;
 import com.scrapper.dto.ScrapedApartment;
+import com.scrapper.entity.Apartment;
+import com.scrapper.repository.ApartmentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -18,8 +21,11 @@ public class ApartmentRunnerService {
 
     private final WebDriver webDriver;
 
-    public ApartmentRunnerService(WebDriver webDriver) {
+    private ApartmentRepository apartmentRepository;
+
+    public ApartmentRunnerService(WebDriver webDriver, ApartmentRepository apartmentRepository) {
         this.webDriver = webDriver;
+        this.apartmentRepository = apartmentRepository;
     }
 
     public List<ScrapedApartment> scrape() {
@@ -53,6 +59,7 @@ public class ApartmentRunnerService {
                 result.add(new ScrapedApartment(url, price, address, currency));
             }
         }
+        updateInactiveApartments(result);
         return result;
     }
 
@@ -92,6 +99,34 @@ public class ApartmentRunnerService {
             }
         }
         return maxPage;
+    }
+
+    public void updateInactiveApartments(List<ScrapedApartment> scrapedApartments) {
+        List<String> scrapedUrls = scrapedApartments.stream()
+                .map(ScrapedApartment::getUrl).toList();
+
+        List<Apartment> allFromDb = apartmentRepository.findAll();
+
+        int reactivatedCount = 0;
+        int deactivatedCount = 0;
+
+        for (Apartment apartment : allFromDb) {
+            boolean shouldBeActive = scrapedUrls.contains(apartment.getUrl());
+            if (apartment.getIsActive() != shouldBeActive) {
+                apartment.setIsActive(shouldBeActive);
+                apartmentRepository.save(apartment);
+                if (!shouldBeActive) {
+                    deactivatedCount++;
+                    log.info("deactivated offer: {}", apartment.getUrl());
+                }
+            } else {
+                reactivatedCount++;
+                log.info("reactivated offer: {}", apartment.getUrl());
+            }
+        }
+
+        log.info("Number of deactivated offers: {}", deactivatedCount);
+        log.info("Number of activated offers: {}", reactivatedCount);
     }
 
 }
