@@ -32,7 +32,7 @@ public class ApartmentRunnerService {
 
         List<ScrapedApartment> result = new ArrayList<>();
 
-        for (int page = 1; page < lastPage; page++) {
+        for (int page = 1; page <= lastPage; page++) {
             String link = "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/podkarpackie/rzeszow/rzeszow/rzeszow?priceMin=300000&priceMax=500000&viewType=listing&page=" + page;
             webDriver.get(link);
 
