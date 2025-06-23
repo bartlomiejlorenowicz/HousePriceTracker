@@ -42,7 +42,7 @@ public class ApartmentService {
                                 String.valueOf(newPrice),
                                 existing.getUserId()
                         );
-                            rabbitTemplate.convertAndSend("apartment.events.exchange", "apartment.price-dropped", event);
+                            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY, event);
                         } else {
                             repository.save(existing);
                         }

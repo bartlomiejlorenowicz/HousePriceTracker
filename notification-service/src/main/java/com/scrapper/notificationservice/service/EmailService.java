@@ -1,5 +1,6 @@
 package com.scrapper.notificationservice.service;
 
+import com.scrapper.notificationservice.dto.PriceDropEvent;
 import com.scrapper.notificationservice.validator.EmailValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -33,4 +34,20 @@ public class EmailService {
         message.setText(body);
         mailSender.send(message);
     }
+
+    public void sendPriceDropAlert(String to, String subject, String body) {
+
+        if (!EmailValidator.isValidEmail(to)) {
+            log.error("Invalid email address: {}", to);
+            return;
+        }
+
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom("lorenowiczbartlomiej@gmail.com");
+        simpleMailMessage.setTo(to);
+        simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(body);
+        mailSender.send(simpleMailMessage);
+    }
+
 }
