@@ -2,6 +2,7 @@ package com.scrapper.notificationservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scrapper.notificationservice.config.NotificationConfig;
 import com.scrapper.notificationservice.dto.UserNotificationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -19,7 +20,7 @@ public class UserRegistrationListener {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = "user.registered.queue")
+    @RabbitListener(queues = NotificationConfig.USER_QUEUE)
     public void onUserRegistered(String event) throws JsonProcessingException {
         UserNotificationEvent userNotificationEvent = objectMapper.readValue(event, UserNotificationEvent.class);
         log.info("Received UserRegisteredEvent for user: {}", userNotificationEvent.getEmail());

@@ -27,7 +27,19 @@ public class ApartmentPriceDropListener {
         log.info("Received price drop event for apartment: {}. Old: {}, New: {}",
                 event.getUrl(), event.getOldPrice(), event.getNewPrice());
 
-        // wysłać e-mail do użytkownika:
-        // emailService.sendPriceDropAlert(event.getUserId(), event.getUrl(), event.getOldPrice(), event.getNewPrice());
+        String subject = "Price reduction for the apartment you are looking at!";
+        String body = String.format(
+                "Hello!\n\n" +
+                        "The price of the apartment you are looking at has been reduced!\n\n" +
+                        "Previous price: %s\n" +
+                        "New price: %s\n\n" +
+                        "See the offer: %s\n\n" +
+                event.getOldPrice(),
+                event.getNewPrice(),
+                event.getUrl()
+        );
+
+        String userEmail = event.getEmail();
+        emailService.sendPriceDropAlert(userEmail, subject, body);
     }
 }

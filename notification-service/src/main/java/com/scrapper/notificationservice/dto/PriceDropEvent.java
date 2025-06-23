@@ -11,4 +11,5 @@ public class PriceDropEvent {
     private final String oldPrice;
     private final String newPrice;
     private final Long userId;
+    private final String email;
 }
