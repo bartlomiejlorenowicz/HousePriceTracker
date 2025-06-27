@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="001-create-apartments-table" author="Bartek">
+    <sql>
+        CREATE TABLE apartments (
+            id BIGSERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            address VARCHAR(255) NOT NULL,
+            price VARCHAR(100) NOT NULL,
+            initial_price VARCHAR(100) NOT NULL,
+            url VARCHAR(255) NOT NULL UNIQUE,
+            added_at TIMESTAMP NOT NULL,
+            last_checked_at TIMESTAMP,
+            room_count INT NOT NULL
+        )
+    </sql>
+</changeSet>
+
+    <changeSet id="002-change-price-type" author="Bartek">
+        <modifyDataType tableName="apartments"
+                        columnName="price"
+                        newDataType="NUMERIC(19,2)"/>
+    </changeSet>
+
+    <changeSet id="003-change-initial-price-type" author="Bartek">
+        <modifyDataType tableName="apartments"
+                        columnName="initial_price"
+                        newDataType="NUMERIC(19,2)"/>
+    </changeSet>
+
+    <changeSet id="004-add-currency-column" author="Bartek">
+        <addColumn tableName="apartments">
+            <column name="currency" type="VARCHAR(3)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="005-currency-check-constraint" author="Bartek">
+        <sql>
+            ALTER TABLE apartments
+                ADD CONSTRAINT chk_currency_valid
+                    CHECK (currency IN ('PLN', 'EUR'));
+        </sql>
+    </changeSet>
+
+    <changeSet id="005-add-isActive-column" author="Bartek">
+        <addColumn tableName="apartments">
+            <column name="is_active" type="boolean" defaultValue="true"></column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
