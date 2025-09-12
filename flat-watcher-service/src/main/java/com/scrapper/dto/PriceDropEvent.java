@@ -10,5 +10,4 @@ public class PriceDropEvent {
     private final String url;
     private final String oldPrice;
     private final String newPrice;
-    private final Long userId;
 }

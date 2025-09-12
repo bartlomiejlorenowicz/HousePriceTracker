@@ -1,13 +1,11 @@
 package com.scrapper.service;
 
 import com.scrapper.config.RabbitConfig;
-import com.scrapper.dto.Currency;
 import com.scrapper.dto.PriceDropEvent;
 import com.scrapper.dto.ScrapedApartment;
 import com.scrapper.entity.Apartment;
 import com.scrapper.repository.ApartmentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +37,7 @@ public class ApartmentService {
                                 existing.getId(),
                                 existing.getUrl(),
                                 String.valueOf(oldPrice),
-                                String.valueOf(newPrice),
-                                existing.getUserId()
+                                String.valueOf(newPrice)
                         );
                             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY, event);
                         } else {
@@ -48,14 +45,13 @@ public class ApartmentService {
                         }
             },() -> {
                         Apartment a = Apartment.builder()
-                                .userId(0L)
                                 .url(scrapedApartment.getUrl())
                                 .price(scrapedApartment.getPrice())
                                 .initialPrice(scrapedApartment.getPrice())
                                 .address(scrapedApartment.getAddress())
                                 .addedAt(now)
                                 .lastCheckedAt(now)
-                                .roomCount(0)
+                                .roomCount(scrapedApartment.getRooms() == null ? 0 : scrapedApartment.getRooms())
                                 .currency(scrapedApartment.getCurrency())
                                 .isActive(true)
                                 .build();

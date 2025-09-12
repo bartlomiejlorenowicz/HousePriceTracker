@@ -1,4 +1,4 @@
-package com.scrapper.authservice.dto.authResponse;
+package com.scrapper.authservice.dto.authRegistrationResponse;
 
 import com.scrapper.authservice.dto.response.OperationType;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.scrapper.authservice.controller;
 
-import com.scrapper.authservice.dto.authResponse.UserAuthResponse;
+import com.scrapper.authservice.dto.authRegistrationResponse.UserAuthResponse;
 import com.scrapper.authservice.dto.loginDto.UserLoginRequest;
 import com.scrapper.authservice.service.UserLoginService;
 import jakarta.validation.Valid;

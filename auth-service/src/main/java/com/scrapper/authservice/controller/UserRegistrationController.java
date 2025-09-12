@@ -18,7 +18,7 @@ public class UserRegistrationController {
 
     private final UserRegistrationService userRegistrationService;
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     ResponseEntity<Void> register(@Valid @RequestBody UserDto userDto) {
         userRegistrationService.register(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();

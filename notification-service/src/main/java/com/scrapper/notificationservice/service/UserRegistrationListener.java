@@ -13,16 +13,12 @@ public class UserRegistrationListener {
 
     private final EmailService emailService;
 
-    private final ObjectMapper objectMapper;
-
-    public UserRegistrationListener(EmailService emailService, ObjectMapper objectMapper) {
+    public UserRegistrationListener(EmailService emailService) {
         this.emailService = emailService;
-        this.objectMapper = objectMapper;
     }
 
     @RabbitListener(queues = NotificationConfig.USER_QUEUE)
-    public void onUserRegistered(String event) throws JsonProcessingException {
-        UserNotificationEvent userNotificationEvent = objectMapper.readValue(event, UserNotificationEvent.class);
+    public void onUserRegistered(UserNotificationEvent userNotificationEvent) throws JsonProcessingException {
         log.info("Received UserRegisteredEvent for user: {}", userNotificationEvent.getEmail());
         String subject = "Welcome to Our Service!";
         String body = String.format("Hi %s,\n\nThank you for registering with us. We hope you enjoy using our service!", userNotificationEvent.getFirstName());

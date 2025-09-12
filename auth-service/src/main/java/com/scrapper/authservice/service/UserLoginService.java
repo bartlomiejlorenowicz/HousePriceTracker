@@ -1,6 +1,6 @@
 package com.scrapper.authservice.service;
 
-import com.scrapper.authservice.dto.authResponse.UserAuthResponse;
+import com.scrapper.authservice.dto.authRegistrationResponse.UserAuthResponse;
 import com.scrapper.authservice.dto.loginDto.UserLoginRequest;
 import com.scrapper.authservice.dto.response.OperationType;
 import com.scrapper.authservice.entity.User;

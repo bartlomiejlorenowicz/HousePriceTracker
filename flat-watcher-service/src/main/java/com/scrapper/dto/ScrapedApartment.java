@@ -12,4 +12,5 @@ public class ScrapedApartment {
     private final BigDecimal price;
     private final String address;
     private final Currency currency;
+    private final Integer rooms;
 }

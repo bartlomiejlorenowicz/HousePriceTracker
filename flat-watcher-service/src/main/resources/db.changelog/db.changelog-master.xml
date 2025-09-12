@@ -47,10 +47,20 @@
         </sql>
     </changeSet>
 
-    <changeSet id="005-add-isActive-column" author="Bartek">
+    <changeSet id="006-add-isActive-column" author="Bartek">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <columnExists tableName="apartments" columnName="is_active"/>
+            </not>
+        </preConditions>
+
         <addColumn tableName="apartments">
-            <column name="is_active" type="boolean" defaultValue="true"></column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="007-drop-user-id-from-apartments" author="Bartek">
+        <dropColumn tableName="apartments" columnName="user_id"/>
     </changeSet>
 
 </databaseChangeLog>
