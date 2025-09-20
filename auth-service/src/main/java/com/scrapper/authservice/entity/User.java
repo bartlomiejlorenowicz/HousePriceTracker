@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
@@ -45,7 +45,7 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "last_login_at", nullable = false)
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
     @Enumerated(EnumType.STRING)

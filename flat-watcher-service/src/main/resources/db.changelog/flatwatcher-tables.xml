@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet id="005-create-user-apartment-watch" author="Bartek">
+
+        <sql>
+            CREATE TABLE IF NOT EXISTS user_apartment_watch
+            (
+                id                BIGSERIAL PRIMARY KEY,
+                user_id           BIGINT NOT NULL,
+                apartment_id      BIGINT NOT NULL,
+                min_price         INTEGER,
+                active            BOOLEAN NOT NULL DEFAULT TRUE,
+                created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_notified_at  TIMESTAMP
+            );
+
+            ALTER TABLE user_apartment_watch
+                ADD CONSTRAINT fk_uaw_apartment
+                    FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE;
+
+            ALTER TABLE user_apartment_watch
+                ADD CONSTRAINT uk_uaw_user_apartment
+                    UNIQUE (user_id, apartment_id);
+
+            ALTER TABLE user_apartment_watch
+                ADD CONSTRAINT chk_uaw_min_price_nonneg
+                    CHECK (min_price IS NULL OR min_price &gt;= 0);
+
+            CREATE INDEX IF NOT EXISTS idx_uaw_user_active
+                ON user_apartment_watch(user_id, active);
+
+            -- partial index (PostgreSQL)
+            CREATE INDEX IF NOT EXISTS idx_uaw_apartment_active
+                ON user_apartment_watch(apartment_id)
+                WHERE active;
+        </sql>
+
+        <sql splitStatements="false" stripComments="true">
+            CREATE OR REPLACE FUNCTION set_updated_at_uaw()
+            RETURNS TRIGGER AS $uaw$
+            BEGIN
+              NEW.updated_at := CURRENT_TIMESTAMP;
+            RETURN NEW;
+            END;
+            $uaw$ LANGUAGE plpgsql;
+        </sql>
+
+        <sql>
+            DROP TRIGGER IF EXISTS trg_uaw_set_updated_at ON user_apartment_watch;
+            CREATE TRIGGER trg_uaw_set_updated_at
+                BEFORE UPDATE ON user_apartment_watch
+                FOR EACH ROW EXECUTE FUNCTION set_updated_at_uaw();
+        </sql>
+    </changeSet>
+
+    <changeSet id="006-create-apartment-price-history" author="Bartek">
+        <sql>
+            CREATE TABLE IF NOT EXISTS apartment_price_history
+            (
+                id           BIGSERIAL PRIMARY KEY,
+                apartment_id BIGINT    NOT NULL,
+                price        INTEGER   NOT NULL,
+                collected_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            ALTER TABLE apartment_price_history
+                ADD CONSTRAINT fk_aph_apartment
+                    FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE;
+
+            ALTER TABLE apartment_price_history
+                ADD CONSTRAINT chk_price_nonneg
+                    CHECK (price &gt;= 0);
+
+            CREATE INDEX IF NOT EXISTS idx_aph_apartment_collected
+                ON apartment_price_history(apartment_id, collected_at DESC);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -3,40 +3,37 @@ package com.scrapper.authservice.mapper;
 import com.scrapper.authservice.dto.registerDto.UserDto;
 import com.scrapper.authservice.entity.Role;
 import com.scrapper.authservice.entity.User;
-import com.scrapper.authservice.repository.RoleRepository;
+import com.scrapper.authservice.service.RoleService;
 import com.scrapper.authservice.user.RoleType;
 import com.scrapper.authservice.user.UserStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class UserMapper {
 
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
 
-    public UserMapper(PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
+    public UserMapper(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     public User toEntity(UserDto userDto) {
-        log.info("Mapping UserDto to User entity for email: {}", userDto.getEmail());
+        log.debug("Mapping UserDto to User entity for email: {}", userDto.getEmail());
 
-        Role userRole = roleRepository.findByRole(RoleType.USER)
-                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+        Role userRole = roleService.getRoleReference(RoleType.USER);
 
         return User.builder()
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())
-                .passwordHash(passwordEncoder.encode(userDto.getPassword()))
-                .status(UserStatus.ACTIVE)
-                .roles(Set.of(userRole))
+                .passwordHash(userDto.getPassword())
+                .status(UserStatus.PENDING_EMAIL_VERIFICATION) // todo change to ACTIVE after email verification
+                .roles(new HashSet<>(Set.of(userRole)))
                 .failedLoginAttempts(0)
                 .emailVerified(false)
                 .lastLoginAt(null)
