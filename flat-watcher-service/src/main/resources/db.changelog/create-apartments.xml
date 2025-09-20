@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="000-create-apartments" author="Bartek">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="apartments"/></not>
+        </preConditions>
+        <sql>
+            CREATE TABLE apartments (
+                                        id               BIGSERIAL PRIMARY KEY,
+                                        url_normalized   TEXT    NOT NULL,
+                                        title            TEXT,
+                                        current_price    INTEGER,
+                                        currency         VARCHAR(8) DEFAULT 'PLN',
+                                        source           VARCHAR(64) DEFAULT 'OTODOM',
+                                        created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                        updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+
+            ALTER TABLE apartments
+                ADD CONSTRAINT uk_apartments_url_normalized UNIQUE (url_normalized);
+
+            CREATE OR REPLACE FUNCTION set_updated_at_apartments()
+      RETURNS TRIGGER AS $$
+            BEGIN
+        NEW.updated_at := CURRENT_TIMESTAMP;
+            RETURN NEW;
+            END; $$ LANGUAGE plpgsql;
+
+            DROP TRIGGER IF EXISTS trg_apartments_set_updated_at ON apartments;
+            CREATE TRIGGER trg_apartments_set_updated_at
+                BEFORE UPDATE ON apartments
+                FOR EACH ROW EXECUTE FUNCTION set_updated_at_apartments();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

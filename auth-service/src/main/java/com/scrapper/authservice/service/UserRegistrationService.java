@@ -10,7 +10,9 @@ import com.scrapper.authservice.validator.Userregistration.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -23,12 +25,15 @@ public class UserRegistrationService {
     private final AmqpTemplate rabbit;
     private final String exchange = RabbitConfig.USER_EXCHANGE;
     private final String routingKey = RabbitConfig.REGISTER_ROUTING;
+    private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public void register(UserDto userDto) {
         userValidator.validate(userDto);
         log.info("Starting saving user with email: {}", userDto.getEmail());
 
         User user = userMapper.toEntity(userDto);
+        user.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);
         log.info("User saved, publishing UserRegisteredEvent for id={}", user.getId());
 

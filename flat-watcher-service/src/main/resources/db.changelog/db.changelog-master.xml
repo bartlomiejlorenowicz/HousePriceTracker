@@ -63,4 +63,6 @@
         <dropColumn tableName="apartments" columnName="user_id"/>
     </changeSet>
 
+    <include file="create-apartments.xml" relativeToChangelogFile="true"/>
+    <include file="flatwatcher-tables.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

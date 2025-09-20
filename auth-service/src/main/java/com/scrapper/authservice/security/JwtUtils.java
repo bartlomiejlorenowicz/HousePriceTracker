@@ -1,9 +1,6 @@
 package com.scrapper.authservice.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 
 @Slf4j
@@ -26,6 +25,14 @@ public class JwtUtils {
 
     private Key key;
 
+    private final Clock clock;
+
+    private JwtParser parser;
+
+    public JwtUtils(Clock clock) {
+        this.clock = clock;
+    }
+
     @PostConstruct
     public void init() {
         log.info("Initializing JwtUtils with secret length={} and expirationMs={}",
@@ -35,12 +42,13 @@ public class JwtUtils {
     }
 
     public String generateToken(String email) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationTime);
+        Instant now = clock.instant();
+        Date iat = Date.from(now);
+        Date expiry = Date.from(now.plusMillis(expirationTime));
 
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(now)
+                .setSubject(email) // todo change to user id or uuid
+                .setIssuedAt(iat)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -63,20 +71,38 @@ public class JwtUtils {
         }
     }
 
+//    public boolean validateToken(String token, String username) {
+//        log.debug("Validating token for user='{}'", username);
+//        try {
+//            Claims claims = Jwts.parserBuilder()
+//                    .setSigningKey(key)
+//                    .build()
+//                    .parseClaimsJws(token)
+//                    .getBody();
+//
+//            boolean subjectOk = username.equals(claims.getSubject());
+//            boolean notExpired = claims.getExpiration().after(Date.from(clock.instant()));
+//
+//            return username.equals(claims.getSubject())
+//                    && !claims.getExpiration().before(new Date());
+//        } catch (JwtException e) {
+//            log.warn("Token validation error: {}", e.getMessage());
+//            return false;
+//        }
+//    }
+
     public boolean validateToken(String token, String username) {
-        log.debug("Validating token for user='{}'", username);
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            return username.equals(claims.getSubject())
-                    && !claims.getExpiration().before(new Date());
+            Claims claims = parser.parseClaimsJws(token).getBody();
+            boolean subjectOk = username.equals(claims.getSubject());
+            boolean notExpired = claims.getExpiration().after(Date.from(clock.instant()));
+            return subjectOk && notExpired;
         } catch (JwtException e) {
             log.warn("Token validation error: {}", e.getMessage());
             return false;
         }
     }
+
+    // todo test expiry token Clock
 
 }
