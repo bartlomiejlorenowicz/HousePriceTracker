@@ -44,7 +44,8 @@ public class ApartmentRunnerService {
         acceptCookiesIfVisible();
         waitForListing();
 
-        int lastPage = getPagination(webDriver);
+//        int lastPage = getPagination(webDriver);
+        int lastPage = 1;
         log.info("number of pages: {}", lastPage);
 
         List<ScrapedApartment> result = new ArrayList<>();
@@ -130,10 +131,41 @@ public class ApartmentRunnerService {
             WebElement priceEl = card.findElement(
                     By.cssSelector("[data-sentry-element='MainPrice']")
             );
-            String priceText = priceEl.getText();
-            String digits = priceText.replaceAll("[^0-9]", "");
-            if (digits.isEmpty()) return null;
-            return new BigDecimal(digits);
+            String raw = priceEl.getText();
+            if (raw == null)
+                return null;
+
+            String txt = raw.replace('\u00A0', ' ').trim();
+
+            String num = txt.replaceAll("[^0-9,\\.]", "");
+            if (num.isEmpty())
+                return null;
+
+            int lastComma = num.lastIndexOf(',');
+            int lastDot   = num.lastIndexOf('.');
+            int lastSep   = Math.max(lastComma, lastDot);
+
+            String normalized;
+            if (lastSep >= 0) {
+                char decSep = num.charAt(lastSep);
+
+                String intPart = num.substring(0, lastSep).replaceAll("[^0-9]", "");
+
+                String fracPart = num.substring(lastSep + 1).replaceAll("[^0-9]", "");
+                if (fracPart.length() == 0) {
+                    fracPart = "00";
+                } else if (fracPart.length() == 1) {
+                    fracPart = fracPart + "0";
+                } else if (fracPart.length() > 2) {
+                    fracPart = fracPart.substring(0, 2);
+                }
+                normalized = intPart + "." + fracPart;
+            } else {
+                String intPart = num.replaceAll("[^0-9]", "");
+                normalized = intPart + ".00";
+            }
+
+            return new BigDecimal(normalized);
         } catch (Exception e) {
             log.warn("Error retrieving price: {}", e.getMessage());
             return null;

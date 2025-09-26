@@ -139,7 +139,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.scrapper.UserAuthenticationApplication</mainClass>
+                    <mainClass>com.scrapper.authservice.UserAuthenticationApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
