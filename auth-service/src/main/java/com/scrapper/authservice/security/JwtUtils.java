@@ -1,5 +1,6 @@
 package com.scrapper.authservice.security;
 
+import com.scrapper.authservice.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -41,13 +42,14 @@ public class JwtUtils {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         Instant now = clock.instant();
         Date iat = Date.from(now);
         Date expiry = Date.from(now.plusMillis(expirationTime));
 
         return Jwts.builder()
-                .setSubject(email) // todo change to user id or uuid
+                .setSubject(user.getEmail()) // todo change to user id or uuid
+                .claim("id", user.getId())
                 .setIssuedAt(iat)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -71,26 +73,6 @@ public class JwtUtils {
         }
     }
 
-//    public boolean validateToken(String token, String username) {
-//        log.debug("Validating token for user='{}'", username);
-//        try {
-//            Claims claims = Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(token)
-//                    .getBody();
-//
-//            boolean subjectOk = username.equals(claims.getSubject());
-//            boolean notExpired = claims.getExpiration().after(Date.from(clock.instant()));
-//
-//            return username.equals(claims.getSubject())
-//                    && !claims.getExpiration().before(new Date());
-//        } catch (JwtException e) {
-//            log.warn("Token validation error: {}", e.getMessage());
-//            return false;
-//        }
-//    }
-
     public boolean validateToken(String token, String username) {
         try {
             Claims claims = parser.parseClaimsJws(token).getBody();
@@ -103,6 +85,19 @@ public class JwtUtils {
         }
     }
 
-    // todo test expiry token Clock
+    public Long extractUserId(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("id", Long.class);
+        } catch (JwtException e) {
+            log.warn("Failed to extract userId from token: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
 }

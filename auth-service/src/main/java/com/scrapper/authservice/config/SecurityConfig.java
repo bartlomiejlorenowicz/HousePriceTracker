@@ -17,8 +17,6 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.time.Clock;
-
 @Configuration
 public class SecurityConfig {
 
@@ -67,8 +65,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public Clock clock() {
-//        return Clock.systemUTC();
-//    }
-}

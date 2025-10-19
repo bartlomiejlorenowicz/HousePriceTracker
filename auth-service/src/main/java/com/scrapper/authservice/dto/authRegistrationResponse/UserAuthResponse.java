@@ -11,6 +11,8 @@ import java.time.Instant;
 public class UserAuthResponse {
 
     private String token;
+    private Long userId;
+    private String email;
 
     @Builder.Default
     private Instant timestamp = Instant.now();
