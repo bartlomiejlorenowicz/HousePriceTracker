@@ -59,4 +59,17 @@
         </sql>
     </changeSet>
 
+    <changeSet id="005-user-status-allow-pending" author="Bartek">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="users"/>
+        </preConditions>
+        <sql>
+            ALTER TABLE public.users DROP CONSTRAINT IF EXISTS chk_user_status;
+            ALTER TABLE public.users ADD CONSTRAINT chk_user_status
+                CHECK (status IN ('ACTIVE','INACTIVE','LOCKED','PENDING_EMAIL_VERIFICATION'));
+            ALTER TABLE public.users ALTER COLUMN status SET DEFAULT 'PENDING_EMAIL_VERIFICATION';
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>
