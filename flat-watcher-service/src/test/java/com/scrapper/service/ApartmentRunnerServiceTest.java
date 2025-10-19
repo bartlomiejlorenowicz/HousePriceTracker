@@ -1,49 +1,83 @@
 package com.scrapper.service;
 
+import com.scrapper.dto.Currency;
+import com.scrapper.dto.ScrapedApartment;
+import com.scrapper.dto.SearchFilter;
+import com.scrapper.entity.Apartment;
 import com.scrapper.repository.ApartmentRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.exceptions.base.MockitoException;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.mockito.MockitoAnnotations;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ApartmentRunnerServiceTest {
 
     @Mock
-    private WebDriver mockWebDriver;
+    private ApartmentScraper scraper;
 
     @Mock
-    private ApartmentRepository mockRepository;
+    private ApartmentRepository apartmentRepository;
+
+    @Mock
+    private SearchFilter searchFilter;
 
     @InjectMocks
-    private ApartmentRunnerService service;
+    private ApartmentRunnerService runnerService;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void testPrivateGetPrice() throws Exception {
-        WebElement mockCard = mock(WebElement.class);
-        WebElement priceElement = mock(WebElement.class);
+    void shouldReturnScrapedApartmentsAndUpdateStatuses() {
+        ScrapedApartment scraped1 = new ScrapedApartment("url1", new BigDecimal("400000"), "Adres 1", Currency.PLN, 2);
+        ScrapedApartment scraped2 = new ScrapedApartment("url2", new BigDecimal("450000"), "Adres 2", Currency.PLN, 3);
+        when(scraper.scrapeApartments(searchFilter)).thenReturn(List.of(scraped1, scraped2));
 
-        when(mockCard.findElement(By.cssSelector(".evk7nst0"))).thenReturn(priceElement);
-        when(priceElement.getText()).thenReturn("425 000 zł");
+        Apartment existing1 = new Apartment();
+        existing1.setUrl("url1");
+        existing1.setIsActive(false);
 
-        Method method = ApartmentRunnerService.class.getDeclaredMethod("getPrice", WebElement.class);
-        method.setAccessible(true);
+        Apartment existing2 = new Apartment();
+        existing2.setUrl("url3");
+        existing2.setIsActive(true);
 
-        BigDecimal result = (BigDecimal) method.invoke(service, mockCard);
+        when(apartmentRepository.findAll()).thenReturn(List.of(existing1, existing2));
 
-        assertEquals(new BigDecimal("425000"), result);
+        List<ScrapedApartment> result = runnerService.scrape();
+
+        assertEquals(2, result.size());
+
+        assertTrue(existing1.getIsActive());
+
+        assertFalse(existing2.getIsActive());
+
+        verify(apartmentRepository, times(1)).save(existing1);
+        verify(apartmentRepository, times(1)).save(existing2);
+    }
+
+    @Test
+    void shouldNotSaveAnythingIfNoStatusChanges() {
+        ScrapedApartment scraped = new ScrapedApartment("url1", new BigDecimal("400000"), "Adres 1", Currency.PLN, 2);
+        when(scraper.scrapeApartments(searchFilter)).thenReturn(List.of(scraped));
+
+        Apartment apartment = new Apartment();
+        apartment.setUrl("url1");
+        apartment.setIsActive(true);
+
+        when(apartmentRepository.findAll()).thenReturn(List.of(apartment));
+
+        runnerService.scrape();
+
+        verify(apartmentRepository, never()).save(any());
     }
 
 }
